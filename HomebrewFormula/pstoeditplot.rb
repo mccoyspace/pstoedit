@@ -1,7 +1,7 @@
 class Pstoeditplot < Formula
   desc "Convert PostScript and PDF files to editable vector graphics"
   homepage "http://www.pstoedit.net/"
-  url "https://downloads.sourceforge.net/project/pstoedit/pstoedit/3.75/pstoedit-3.75.tar.gz"
+  url "https://github.com/mccoyspace/homebrew-pstoeditplot/archive/v1.0.tar.gz"
   sha256 "b7b5d8510b40a5b148f7751268712fcfd0c1ed2bb46f359f655b6fcdc53364cf"
 
   bottle do
