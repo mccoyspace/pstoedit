@@ -63,13 +63,14 @@ void drvGCODE::open_page()
 	outf << "( gcode output module by Lawrence Glaister VE7IT - modified for a plotter by @mccoyspace )\n";
 	outf << "G21            ; set units to millimeters\n";
 	outf << "G90            ; set absolute positioning\n";
+	outf << "M3 S165        ; pen up\n";
 	outf << "G0 F1100		; set G0 speed\n";
 	outf << "G0 X0 Y0	; zero x and y axes\n";
 }
 
 void drvGCODE::close_page()
 {
-	outf << "M3 S165         ; lift pen\n";
+	outf << "M3 S165                      ;lift pen\n";
 }
 
 void drvGCODE::show_path()
@@ -83,24 +84,22 @@ void drvGCODE::show_path()
 		switch (elem.getType()) {
 		case moveto:{
 				const Point & p = elem.getPoint(0);
-				outf << "\nM3 S165      ;lift pen\n"; //lift pen
-				outf << "G0 F1400\n";
-				outf << "G0 X" << p.x_ << " Y" << p.y_ << "\n";
+				outf << "\nM3 S165                      ;lift pen\n"; //lift pen
+				outf << "G0 X" << p.x_ << " Y" << p.y_ << " F20000   ;move to\n";
+				outf << "M3 S115                      ;lower pen\n";
 				//outf << "\n" << options->intensity.value; // fire the laser
-				outf << "M3 S115     ;lower pen\n";  //lower pen
 				currentPoint = p;
 			}
 			break;
 		case lineto:{
 				const Point & p = elem.getPoint(0);
-				outf << "G1 F1100\n";
-				outf << "G1 X" << p.x_ << " Y" << p.y_ << "\n";
+				outf << "G0 X" << p.x_ << " Y" << p.y_ << " F2000   ;line to\n";
 				currentPoint = p;
 			}
 			break;
 		case closepath:
 				//outf << "G1 F1100\n";
-				outf << "G1 X" << firstPoint.x_ << " Y" << firstPoint.y_ << "\n";
+				outf << "G0 X" << firstPoint.x_ << " Y" << firstPoint.y_ << " F2000   ;close path\n\n";
 			break;
 
 		case curveto:{
@@ -112,15 +111,14 @@ void drvGCODE::show_path()
 			// we compute distance between current point and endpoint and use that to help
 			// pick the number of segments to use.
 			const float dist = (float) pythagoras((float)(ep.x_ - currentPoint.x_),(float)(ep.y_ - currentPoint.y_)); 
-			unsigned int fitpoints = (unsigned int)(dist / 10.0);
-			if ( fitpoints < 5 ) fitpoints = 5;
-			if ( fitpoints > 50 ) fitpoints = 50;
+			unsigned int fitpoints = (unsigned int)(dist / 500.0);
+			if ( fitpoints < 10 ) fitpoints = 10;
+			if ( fitpoints > 1000 ) fitpoints = 1000;
 
 			for (unsigned int s = 1; s < fitpoints; s++) {
 				const float t = 1.0f * s / (fitpoints - 1);
 				const Point pt = PointOnBezier(t, currentPoint, cp1, cp2, ep);
-				outf << "G1 F1100\n";
-				outf << "G1 X" << pt.x_ << " Y" << pt.y_ << "\n";
+				outf << "G0 X" << pt.x_ << " Y" << pt.y_ << " F2000   ;curve step\n";
 			}
 			currentPoint = ep;
 
