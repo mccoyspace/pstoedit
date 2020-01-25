@@ -84,22 +84,23 @@ void drvGCODE::show_path()
 		case moveto:{
 				const Point & p = elem.getPoint(0);
 				outf << "\nM3 S165\n"; //lift pen
-				//outf << "G0 X" << p.x_ << " Y" << p.y_ << " F20000\n";
-				outf << "G0 X" << p.x_ << " Y" << p.y_ << " F20000\n";
+				outf << "G0 F2000\n";
+				outf << "G0 X" << p.x_ << " Y" << p.y_ << "\n";
 				outf << "M3 S148\n";
+				outf << "G0 F2000\n";
 				//outf << "\n" << options->intensity.value; // fire the laser
 				currentPoint = p;
 			}
 			break;
 		case lineto:{
 				const Point & p = elem.getPoint(0);
-				outf << "G0 X" << p.x_ << " Y" << p.y_ << " F2000\n";
+				outf << "G0 X" << p.x_ << " Y" << p.y_ << "\n";
 				currentPoint = p;
 			}
 			break;
 		case closepath:
 				//outf << "G1 F1100\n";
-				outf << "G0 X" << firstPoint.x_ << " Y" << firstPoint.y_ << " F2000\n";
+				outf << "G0 X" << firstPoint.x_ << " Y" << firstPoint.y_ << "\n";
 			break;
 
 		case curveto:{
@@ -118,7 +119,7 @@ void drvGCODE::show_path()
 			for (unsigned int s = 1; s < fitpoints; s++) {
 				const float t = 1.0f * s / (fitpoints - 1);
 				const Point pt = PointOnBezier(t, currentPoint, cp1, cp2, ep);
-				outf << "G0 X" << pt.x_ << " Y" << pt.y_ << " F2000\n";
+				outf << "G0 X" << pt.x_ << " Y" << pt.y_ << "\n";
 			}
 			currentPoint = ep;
 
