@@ -69,7 +69,7 @@ void drvGCODE::open_page()
 
 void drvGCODE::close_page()
 {
-	outf << "M3 S165\n";
+	outf << "M3 S165\n\n";
 }
 
 void drvGCODE::show_path()
